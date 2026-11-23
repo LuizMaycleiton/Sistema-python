@@ -73,3 +73,33 @@ def conectar_banco():
     )
     '''
   
+   # --- DADOS INICIAIS DE TESTE ---
+    cursor.execute("select count(*) from configuracoes")
+    if cursor.fetchone()[0] == 0:
+        cursor.execute("insert into configuracoes (chave, valor) values ('preco_kg', 60.00)")
+
+    cursor.execute("select count(*) from motoboys")
+    if cursor.fetchone()[0] == 0:
+        cursor.execute("insert into motoboys (nome, telefone, placa, tipo_bau, status) values ('Roberto Alves', '(11) 98888-7777', 'ABC-1234', 'Baú Plano Grande', 'Disponível')")
+        cursor.execute("insert into motoboys (nome, telefone, placa, tipo_bau, status) values ('Thiago Souza', '(11) 97777-6666', 'XYZ-5678', 'Baú Padrão', 'Disponível')")
+
+    cursor.execute("select count(*) from produtos")
+    if cursor.fetchone()[0] == 0:
+        cursor.execute("insert into produtos (nome, categoria, preco) values ('Bolo Médio de Cenoura', 'Bolo Médio', 45.00)")
+        cursor.execute("insert into produtos (nome, categoria, preco) values ('Fatia Red Velvet', 'Fatia', 14.00)")
+        cursor.execute("insert into produtos (nome, categoria, preco) values ('Coca-Cola 2L', 'Bebida', 12.00)")
+
+    cursor.execute("select count(*) from opcoes_bolo")
+    if cursor.fetchone()[0] == 0:
+        cursor.execute("insert into opcoes_bolo (tipo, nome) values ('Massa', 'Branca')")
+        cursor.execute("insert into opcoes_bolo (tipo, nome) values ('Massa', 'Chocolate')")
+        cursor.execute("insert into opcoes_bolo (tipo, nome) values ('Recheio', 'Ninho com Morango')")
+        cursor.execute("insert into opcoes_bolo (tipo, nome) values ('Recheio', 'Brigadeiro')")
+
+    cursor.execute("select count(*) from clientes")
+    if cursor.fetchone()[0] == 0:
+        cursor.execute("insert into clientes (nome, telefone, endereco) values ('João Pedro', '(11) 99999-0000', 'Rua das Acácias, 120')")
+        cursor.execute("insert into clientes (nome, telefone, endereco) values ('Carla Dias', '(11) 98888-8888', 'Rua das Flores, 45')")
+
+    conexao.commit()
+    return conexao, cursor
