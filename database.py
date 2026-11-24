@@ -1,7 +1,10 @@
+import os
 import sqlite3
 
+NOME_BANCO = os.environ.get("DB_PATH", "atelier_bolo.db")
+
 def conectar_banco():
-    conexao = sqlite3.connect("atelier_bolo.db", check_same_thread=False)
+    conexao = sqlite3.connect(NOME_BANCO, check_same_thread=False)
     cursor = conexao.cursor()
 
     # 1. Tabela de Clientes
@@ -72,8 +75,9 @@ def conectar_banco():
         data_pedido text default (datetime('now', 'localtime'))
     )
     '''
-  
-   # --- DADOS INICIAIS DE TESTE ---
+    cursor.execute(sql_pedidos)
+
+    # --- DADOS INICIAIS DE TESTE ---
    
     cursor.execute("select count(*) from configuracoes")
     if cursor.fetchone()[0] == 0:
