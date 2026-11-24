@@ -217,3 +217,49 @@ def atualizar_preco_kg(novo_valor):
     cursor.execute(sql, (novo_valor,))
     conexao.commit()
 
+
+# =====================================================================
+# MOTOBOYS
+# =====================================================================
+def cadastrar_motoboy(nome, telefone, placa, tipo_bau):
+    conexao, cursor = conectar_banco()
+    sql = '''
+    insert into motoboys (nome, telefone, placa, tipo_bau, status)
+    values (?, ?, ?, ?, 'Disponível')
+    '''
+    cursor.execute(sql, (nome, telefone, placa, tipo_bau))
+    conexao.commit()
+
+
+def listar_motoboys():
+    conexao, cursor = conectar_banco()
+    sql = '''
+    select * from motoboys
+    '''
+    cursor.execute(sql)
+    resultados = cursor.fetchall()
+    return resultados
+
+
+def listar_motoboys_disponiveis(peso_bolo):
+    conexao, cursor = conectar_banco()
+    if peso_bolo > 2.0:
+        sql = '''
+        select * from motoboys where status = 'Disponível' and tipo_bau = 'Baú Plano Grande'
+        '''
+    else:
+        sql = '''
+        select * from motoboys where status = 'Disponível'
+        '''
+    cursor.execute(sql)
+    resultados = cursor.fetchall()
+    return resultados
+
+
+def alterar_status_motoboy(id_motoboy, novo_status):
+    conexao, cursor = conectar_banco()
+    sql = '''
+    update motoboys set status = ? where id = ?
+    '''
+    cursor.execute(sql, (novo_status, id_motoboy))
+    conexao.commit()
