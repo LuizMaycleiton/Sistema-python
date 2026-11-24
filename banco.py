@@ -126,3 +126,94 @@ def listar_clientes():
     cursor.execute(sql)
     resultados = cursor.fetchall()
     return resultados
+
+
+# =====================================================================
+# PRODUTOS E OPÇÕES DE BOLO
+# =====================================================================
+def cadastrar_produto(nome, categoria, preco):
+    conexao, cursor = conectar_banco()
+    sql = '''
+    insert into produtos (nome, categoria, preco)
+    values (?, ?, ?)
+    '''
+    cursor.execute(sql, (nome, categoria, preco))
+    conexao.commit()
+
+
+def listar_produtos():
+    conexao, cursor = conectar_banco()
+    sql = '''
+    select * from produtos
+    '''
+    cursor.execute(sql)
+    resultados = cursor.fetchall()
+    return resultados
+
+
+def excluir_produto(id_produto):
+    conexao, cursor = conectar_banco()
+    sql = '''
+    delete from produtos where id = ?
+    '''
+    cursor.execute(sql, (id_produto,))
+    conexao.commit()
+
+
+def cadastrar_opcao_bolo(tipo, nome):
+    conexao, cursor = conectar_banco()
+    sql = '''
+    insert into opcoes_bolo (tipo, nome)
+    values (?, ?)
+    '''
+    cursor.execute(sql, (tipo, nome))
+    conexao.commit()
+
+
+def listar_opcoes_bolo():
+    conexao, cursor = conectar_banco()
+    sql = '''
+    select * from opcoes_bolo
+    '''
+    cursor.execute(sql)
+    resultados = cursor.fetchall()
+    return resultados
+
+
+def listar_opcoes_por_tipo(tipo):
+    conexao, cursor = conectar_banco()
+    sql = '''
+    select * from opcoes_bolo where tipo = ?
+    '''
+    cursor.execute(sql, (tipo,))
+    resultados = cursor.fetchall()
+    return resultados
+
+
+def excluir_opcao_bolo(id_opcao):
+    conexao, cursor = conectar_banco()
+    sql = '''
+    delete from opcoes_bolo where id = ?
+    '''
+    cursor.execute(sql, (id_opcao,))
+    conexao.commit()
+
+
+def obter_preco_kg():
+    conexao, cursor = conectar_banco()
+    sql = '''
+    select valor from configuracoes where chave = 'preco_kg'
+    '''
+    cursor.execute(sql)
+    resultado = cursor.fetchone()
+    return resultado[0]
+
+
+def atualizar_preco_kg(novo_valor):
+    conexao, cursor = conectar_banco()
+    sql = '''
+    update configuracoes set valor = ? where chave = 'preco_kg'
+    '''
+    cursor.execute(sql, (novo_valor,))
+    conexao.commit()
+
