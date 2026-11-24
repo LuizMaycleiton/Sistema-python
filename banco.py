@@ -103,3 +103,26 @@ def conectar_banco():
 
     conexao.commit()
     return conexao, cursor
+
+
+# =====================================================================
+# CLIENTES
+# =====================================================================
+def cadastrar_cliente(nome, telefone, endereco):
+    conexao, cursor = conectar_banco()
+    sql = '''
+    insert into clientes (nome, telefone, endereco)
+    values (?, ?, ?)
+    '''
+    cursor.execute(sql, (nome, telefone, endereco))
+    conexao.commit()
+
+
+def listar_clientes():
+    conexao, cursor = conectar_banco()
+    sql = '''
+    select * from clientes
+    '''
+    cursor.execute(sql)
+    resultados = cursor.fetchall()
+    return resultados
