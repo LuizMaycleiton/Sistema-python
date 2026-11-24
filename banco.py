@@ -74,6 +74,7 @@ def conectar_banco():
     '''
   
    # --- DADOS INICIAIS DE TESTE ---
+   
     cursor.execute("select count(*) from configuracoes")
     if cursor.fetchone()[0] == 0:
         cursor.execute("insert into configuracoes (chave, valor) values ('preco_kg', 60.00)")
@@ -105,9 +106,8 @@ def conectar_banco():
     return conexao, cursor
 
 
-# =====================================================================
 # CLIENTES
-# =====================================================================
+
 def cadastrar_cliente(nome, telefone, endereco):
     conexao, cursor = conectar_banco()
     sql = '''
@@ -128,9 +128,8 @@ def listar_clientes():
     return resultados
 
 
-# =====================================================================
 # PRODUTOS E OPÇÕES DE BOLO
-# =====================================================================
+
 def cadastrar_produto(nome, categoria, preco):
     conexao, cursor = conectar_banco()
     sql = '''
@@ -218,9 +217,8 @@ def atualizar_preco_kg(novo_valor):
     conexao.commit()
 
 
-# =====================================================================
 # MOTOBOYS
-# =====================================================================
+
 def cadastrar_motoboy(nome, telefone, placa, tipo_bau):
     conexao, cursor = conectar_banco()
     sql = '''
@@ -262,4 +260,79 @@ def alterar_status_motoboy(id_motoboy, novo_status):
     update motoboys set status = ? where id = ?
     '''
     cursor.execute(sql, (novo_status, id_motoboy))
+    conexao.commit()
+
+
+# PEDIDOS
+
+def abrir_pedido(cliente_id, descricao_itens, peso_bolo, taxa_entrega, valor_total):
+    conexao, cursor = conectar_banco()
+    sql = '''
+    insert into pedidos (cliente_id, descricao_itens, peso_bolo, taxa_entrega, valor_total, etapa)
+    values (?, ?, ?, ?, ?, 'Recebido')
+    '''
+    cursor.execute(sql, (cliente_id, descricao_itens, peso_bolo, taxa_entrega, valor_total))
+    conexao.commit()
+
+
+def listar_pedidos_por_etapa(etapa):
+    conexao, cursor = conectar_banco()
+    sql = '''
+    select pedidos.id, clientes.nome, clientes.endereco, pedidos.descricao_itens,
+           pedidos.peso_bolo, pedidos.valor_total, motoboys.nome, motoboys.placa, pedidos.motoboy_id
+    from pedidos
+    join clientes on pedidos.cliente_id = clientes.id
+    left join motoboys on pedidos.motoboy_id = motoboys.id
+    where pedidos.etapa = ?
+    '''
+    cursor.execute(sql, (etapa,))
+    resultados = cursor.fetchall()
+    return resultados
+
+
+def listar_todos_pedidos():
+    conexao, cursor = conectar_banco()
+    sql = '''
+    select pedidos.id, pedidos.data_pedido, clientes.nome, clientes.endereco,
+           pedidos.descricao_itens, motoboys.nome, pedidos.valor_total, pedidos.etapa
+    from pedidos
+    join clientes on pedidos.cliente_id = clientes.id
+    left join motoboys on pedidos.motoboy_id = motoboys.id
+    order by pedidos.id desc
+    '''
+    cursor.execute(sql)
+    resultados = cursor.fetchall()
+    return resultados
+
+
+def preparar_pedido(id_pedido):
+    conexao, cursor = conectar_banco()
+    sql = '''
+    update pedidos set etapa = 'Na Confeitaria' where id = ?
+    '''
+    cursor.execute(sql, (id_pedido,))
+    conexao.commit()
+
+
+def cancelar_pedido(id_pedido):
+    conexao, cursor = conectar_banco()
+    sql = '''
+    update pedidos set etapa = 'Cancelado' where id = ?
+    '''
+    cursor.execute(sql, (id_pedido,))
+    conexao.commit()
+
+
+def despachar_pedido(id_pedido, id_motoboy):
+    conexao, cursor = conectar_banco()
+    cursor.execute("update pedidos set etapa = 'Saiu para Entrega', motoboy_id = ? where id = ?", (id_motoboy, id_pedido))
+    cursor.execute("update motoboys set status = 'Em Rota' where id = ?", (id_motoboy,))
+    conexao.commit()
+
+
+def finalizar_entrega(id_pedido, id_motoboy):
+    conexao, cursor = conectar_banco()
+    cursor.execute("update pedidos set etapa = 'Entregue' where id = ?", (id_pedido,))
+    if id_motoboy:
+        cursor.execute("update motoboys set status = 'Disponível' where id = ?", (id_motoboy,))
     conexao.commit()
